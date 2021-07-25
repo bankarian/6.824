@@ -1,10 +1,11 @@
 package mr
 
-import "fmt"
-import "log"
-import "net/rpc"
-import "hash/fnv"
-
+import (
+	"fmt"
+	"hash/fnv"
+	"log"
+	"net/rpc"
+)
 
 //
 // Map functions return a slice of KeyValue.
@@ -23,7 +24,6 @@ func ihash(key string) int {
 	h.Write([]byte(key))
 	return int(h.Sum32() & 0x7fffffff)
 }
-
 
 //
 // main/mrworker.go calls this function.
@@ -82,4 +82,54 @@ func call(rpcname string, args interface{}, reply interface{}) bool {
 
 	fmt.Println(err)
 	return false
+}
+
+type Task struct {
+	File    string // file name
+	NReduce int
+	NMaps   int
+	Seq     int
+	Phase   TaskPhase
+	Alive   bool
+}
+
+// MapFunc takes document name and document content, and
+// produces a set of intermediate KV pairs. It's provided
+// by the user.
+type MapFunc func(name string, content string) []KeyValue
+
+// ReduceFunc accepts an intermediate key and a set of values
+// for that key. It merges together these values to form a result.
+// It's also provided by the user.
+type ReduceFunc func(key string, values []string) string
+
+// worker can do either mapping or reducing
+type worker struct {
+	id       int
+	mapFn    MapFunc
+	reduceFn ReduceFunc
+}
+
+// Registers this worker to the coordinator through RPC.
+func (w *worker) register() {
+
+}
+
+// Requests a Task from the coordinator through RPC,
+// then returns a Task assigned by the coordinator.
+func (w *worker) request() Task {
+
+}
+
+// Reports task to the coorindinator through RPC.
+func (w *worker) report(t Task, done bool, err error) {
+
+}
+
+func (w *worker) doMap(t Task) {
+
+}
+
+func (w *worker) doReduce(t Task) {
+
 }
